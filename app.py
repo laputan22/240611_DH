@@ -3,12 +3,6 @@ import pandas as pd
 import datetime
 from io import BytesIO
 import matplotlib.pyplot as plt
-from matplotlib import font_manager, rc
-
-# 한글 폰트 설정 (Windows 경로 예시)
-font_path = 'C:/Windows/Fonts/malgun.ttf'  # 정확한 경로 확인 필요
-font_name = font_manager.FontProperties(fname=font_path).get_name()
-rc('font', family=font_name)
 
 st.title('굴착 정보 필터링 앱')
 
@@ -81,8 +75,8 @@ if uploaded_file:
             ax.annotate(f'{int(height)}', 
                         (p.get_x() + p.get_width() / 2., height), 
                         ha = 'center', 
-                        va = 'center', 
-                        xytext = (0, 10), 
+                        va = 'bottom', 
+                        xytext = (0, 5), 
                         textcoords = 'offset points',
                         fontsize=10,
                         color='black',
