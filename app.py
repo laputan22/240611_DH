@@ -3,6 +3,21 @@ import pandas as pd
 import datetime
 from io import BytesIO
 import matplotlib.pyplot as plt
+from matplotlib import font_manager, rc
+import requests
+from pathlib import Path
+
+# GitHub 저장소에서 폰트 파일 다운로드
+font_url = "https://github.com/laputan22/240611_DH/raw/main/malgun.ttf"
+font_path = Path("malgun.ttf")
+
+if not font_path.exists():
+    response = requests.get(font_url)
+    font_path.write_bytes(response.content)
+
+# 폰트 설정
+font_name = font_manager.FontProperties(fname=str(font_path)).get_name()
+rc('font', family=font_name)
 
 st.title('굴착 정보 필터링 앱')
 
