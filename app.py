@@ -2,6 +2,13 @@ import streamlit as st
 import pandas as pd
 import datetime
 from io import BytesIO
+import matplotlib.pyplot as plt
+from matplotlib import font_manager, rc
+
+# 한글 폰트 설정 (Windows 경로 예시)
+font_path = 'C:/Windows/Fonts/malgun.ttf'
+font_name = font_manager.FontProperties(fname=font_path).get_name()
+rc('font', family=font_name)
 
 st.title('굴착 정보 필터링 앱')
 
@@ -44,20 +51,46 @@ if uploaded_file:
     construction_start_after_today = filtered_df[(filtered_df['공사시작일'] > today) & (filtered_df['공사시작일'] <= end_of_month)]
 
     # 공사시점주소의 첫 단어를 기준으로 그룹화
-    construction_start_today_or_before['첫단어'] = construction_start_today_or_before['공사시점주소'].apply(lambda x: x.split()[0])
-    construction_start_after_today['첫단어'] = construction_start_after_today['공사시점주소'].apply(lambda x: x.split()[0])
+    construction_start_today_or_before['권역'] = construction_start_today_or_before['공사시점주소'].apply(lambda x: x.split()[0])
+    construction_start_after_today['권역'] = construction_start_after_today['공사시점주소'].apply(lambda x: x.split()[0])
 
-    grouped_start = construction_start_today_or_before.groupby('첫단어').size().reset_index(name='공사시작')
-    grouped_upcoming = construction_start_after_today.groupby('첫단어').size().reset_index(name='공사예정')
+    grouped_start = construction_start_today_or_before.groupby('권역').size().reset_index(name='공사시작')
+    grouped_upcoming = construction_start_after_today.groupby('권역').size().reset_index(name='공사예정')
 
     # 그룹화된 데이터 병합
-    grouped = pd.merge(grouped_start, grouped_upcoming, on='첫단어', how='outer').fillna(0)
+    grouped = pd.merge(grouped_start, grouped_upcoming, on='권역', how='outer').fillna(0)
     grouped['공사시작'] = grouped['공사시작'].astype(int)
     grouped['공사예정'] = grouped['공사예정'].astype(int)
+
+    # 합계 행 추가
+    total_row = pd.DataFrame([['합계', grouped['공사시작'].sum(), grouped['공사예정'].sum()]], columns=['권역', '공사시작', '공사예정'])
+    grouped = pd.concat([total_row, grouped])
 
     # 데이터 프레임을 화면에 표시
     st.subheader('필터링된 결과')
     st.dataframe(grouped)
+
+    # 데이터 시각화
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bars = grouped.set_index('권역').plot(kind='bar', stacked=True, ax=ax)
+
+    # 각 막대 위에 숫자 표시
+    for p in ax.patches:
+        ax.annotate(f'{int(p.get_height())}', 
+                    (p.get_x() + p.get_width() / 2., p.get_height()), 
+                    ha = 'center', 
+                    va = 'center', 
+                    xytext = (0, 10), 
+                    textcoords = 'offset points',
+                    fontsize=10,
+                    color='black',
+                    weight='bold')
+
+    plt.title('공사 현황')
+    plt.xlabel('권역')
+    plt.ylabel('공사 건수')
+    plt.xticks(rotation=45)
+    st.pyplot(fig)
 
     # 필터링된 데이터 다운로드
     def convert_df_to_excel(df):
