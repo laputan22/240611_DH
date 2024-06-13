@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
 
 # 한글 폰트 설정 (Windows 경로 예시)
-font_path = 'C:/Windows/Fonts/malgun.ttf'
+font_path = 'C:/Windows/Fonts/malgun.ttf'  # 정확한 경로 확인 필요
 font_name = font_manager.FontProperties(fname=font_path).get_name()
 rc('font', family=font_name)
 
@@ -76,15 +76,17 @@ if uploaded_file:
 
     # 각 막대 위에 숫자 표시
     for p in ax.patches:
-        ax.annotate(f'{int(p.get_height())}', 
-                    (p.get_x() + p.get_width() / 2., p.get_height()), 
-                    ha = 'center', 
-                    va = 'center', 
-                    xytext = (0, 10), 
-                    textcoords = 'offset points',
-                    fontsize=10,
-                    color='black',
-                    weight='bold')
+        height = p.get_height()
+        if height > 0:
+            ax.annotate(f'{int(height)}', 
+                        (p.get_x() + p.get_width() / 2., height), 
+                        ha = 'center', 
+                        va = 'center', 
+                        xytext = (0, 10), 
+                        textcoords = 'offset points',
+                        fontsize=10,
+                        color='black',
+                        weight='bold')
 
     plt.title('공사 현황')
     plt.xlabel('권역')
