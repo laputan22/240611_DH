@@ -2,30 +2,6 @@ import streamlit as st
 import pandas as pd
 import datetime
 from io import BytesIO
-import matplotlib.pyplot as plt
-from matplotlib import font_manager, rc
-import requests
-from pathlib import Path
-
-# Google Fonts에서 폰트 파일 다운로드
-font_url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
-font_path = Path("NanumGothic-Regular.ttf")
-
-def download_font(url, path):
-    if not path.exists():
-        response = requests.get(url)
-        if response.status_code == 200:
-            path.write_bytes(response.content)
-        else:
-            st.error("폰트 파일을 다운로드할 수 없습니다.")
-download_font(font_url, font_path)
-
-# 폰트 설정
-if font_path.exists():
-    font_name = font_manager.FontProperties(fname=str(font_path)).get_name()
-    rc('font', family=font_name)
-else:
-    st.error("폰트 파일을 사용할 수 없습니다.")
 
 st.title('굴착 정보 필터링 앱')
 
@@ -83,34 +59,14 @@ if uploaded_file:
     total_row = pd.DataFrame([['합계', grouped['공사시작'].sum(), grouped['공사예정'].sum()]], columns=['권역', '공사시작', '공사예정'])
     grouped = pd.concat([total_row, grouped])
 
+    # 데이터 프레임을 전치하고 새로운 열 이름 지정
+    grouped_transposed = grouped.T
+    grouped_transposed.columns = grouped_transposed.iloc[0]
+    grouped_transposed = grouped_transposed[1:]
+
     # 데이터 프레임을 화면에 표시
     st.subheader('필터링된 결과')
-    st.dataframe(grouped)
-
-    # 데이터 시각화
-    fig, ax = plt.subplots(figsize=(10, 6))
-    grouped.set_index('권역').plot(kind='bar', stacked=True, ax=ax)
-
-    # 각 막대 위에 숫자 표시
-    for p in ax.patches:
-        height = p.get_height()
-        if height > 0:
-            ax.annotate(f'{int(height)}', 
-                        (p.get_x() + p.get_width() / 2., height), 
-                        ha = 'center', 
-                        va = 'bottom', 
-                        xytext = (0, 5), 
-                        textcoords = 'offset points',
-                        fontsize=10,
-                        color='black',
-                        weight='bold')
-
-    plt.title('공사 현황', fontsize=16)
-    plt.xlabel('권역', fontsize=14)
-    plt.ylabel('공사 건수', fontsize=14)
-    plt.xticks(rotation=45)
-    plt.tight_layout()  # 레이아웃 자동 조정
-    st.pyplot(fig)
+    st.dataframe(grouped_transposed)
 
     # 필터링된 데이터 다운로드
     def convert_df_to_excel(df):
