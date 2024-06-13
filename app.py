@@ -11,13 +11,21 @@ from pathlib import Path
 font_url = "https://github.com/laputan22/240611_DH/raw/main/malgun.ttf"
 font_path = Path("malgun.ttf")
 
-if not font_path.exists():
-    response = requests.get(font_url)
-    font_path.write_bytes(response.content)
+def download_font(url, path):
+    if not path.exists():
+        response = requests.get(url)
+        if response.status_code == 200:
+            path.write_bytes(response.content)
+        else:
+            st.error("폰트 파일을 다운로드할 수 없습니다.")
+download_font(font_url, font_path)
 
 # 폰트 설정
-font_name = font_manager.FontProperties(fname=str(font_path)).get_name()
-rc('font', family=font_name)
+if font_path.exists():
+    font_name = font_manager.FontProperties(fname=str(font_path)).get_name()
+    rc('font', family=font_name)
+else:
+    st.error("폰트 파일을 사용할 수 없습니다.")
 
 st.title('굴착 정보 필터링 앱')
 
