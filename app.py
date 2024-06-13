@@ -7,9 +7,9 @@ from matplotlib import font_manager, rc
 import requests
 from pathlib import Path
 
-# GitHub 저장소에서 폰트 파일 다운로드
-font_url = "https://github.com/laputan22/240611_DH/raw/main/malgun.ttf"
-font_path = Path("malgun.ttf")
+# Google Fonts에서 폰트 파일 다운로드
+font_url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
+font_path = Path("NanumGothic-Regular.ttf")
 
 def download_font(url, path):
     if not path.exists():
