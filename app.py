@@ -12,7 +12,7 @@ font_path = Path("malgun.ttf")
 # 폰트 설정
 if font_path.exists():
     font_name = font_manager.FontProperties(fname=str(font_path)).get_name()
-    rc('font', family=font_name)
+    plt.rcParams['font.family'] = font_name
 else:
     st.error("폰트 파일을 사용할 수 없습니다.")
 
