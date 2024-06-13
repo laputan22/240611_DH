@@ -4,21 +4,10 @@ import datetime
 from io import BytesIO
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
-import requests
 from pathlib import Path
 
-# GitHub 저장소에서 폰트 파일 다운로드
-font_url = "https://github.com/laputan22/240611_DH/raw/main/malgun.ttf"
+# 프로젝트 루트 디렉토리에 업로드된 폰트 파일 사용
 font_path = Path("malgun.ttf")
-
-def download_font(url, path):
-    if not path.exists():
-        response = requests.get(url)
-        if response.status_code == 200:
-            path.write_bytes(response.content)
-        else:
-            st.error("폰트 파일을 다운로드할 수 없습니다.")
-download_font(font_url, font_path)
 
 # 폰트 설정
 if font_path.exists():
