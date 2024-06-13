@@ -4,15 +4,26 @@ import datetime
 from io import BytesIO
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
+import requests
 from pathlib import Path
 
-# 프로젝트 루트 디렉토리에 업로드된 폰트 파일 사용
+# GitHub 저장소에서 폰트 파일 다운로드
+font_url = "https://github.com/laputan22/240611_DH/raw/main/malgun.ttf"
 font_path = Path("malgun.ttf")
+
+def download_font(url, path):
+    if not path.exists():
+        response = requests.get(url)
+        if response.status_code == 200:
+            path.write_bytes(response.content)
+        else:
+            st.error("폰트 파일을 다운로드할 수 없습니다.")
+download_font(font_url, font_path)
 
 # 폰트 설정
 if font_path.exists():
     font_name = font_manager.FontProperties(fname=str(font_path)).get_name()
-    plt.rcParams['font.family'] = font_name
+    rc('font', family=font_name)
 else:
     st.error("폰트 파일을 사용할 수 없습니다.")
 
@@ -78,7 +89,7 @@ if uploaded_file:
 
     # 데이터 시각화
     fig, ax = plt.subplots(figsize=(10, 6))
-    bars = grouped.set_index('권역').plot(kind='bar', stacked=True, ax=ax)
+    grouped.set_index('권역').plot(kind='bar', stacked=True, ax=ax)
 
     # 각 막대 위에 숫자 표시
     for p in ax.patches:
@@ -94,10 +105,11 @@ if uploaded_file:
                         color='black',
                         weight='bold')
 
-    plt.title('공사 현황')
-    plt.xlabel('권역')
-    plt.ylabel('공사 건수')
+    plt.title('공사 현황', fontsize=16)
+    plt.xlabel('권역', fontsize=14)
+    plt.ylabel('공사 건수', fontsize=14)
     plt.xticks(rotation=45)
+    plt.tight_layout()  # 레이아웃 자동 조정
     st.pyplot(fig)
 
     # 필터링된 데이터 다운로드
